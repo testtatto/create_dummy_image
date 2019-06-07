@@ -4,23 +4,30 @@ from read_csv import read_csv_data
 
 class CreateImage:
     def __init__(self):
-        self.CREATE_FOLDER_PATH = '''C:\\Users\\tatsuto.inoue\\Desktop'''
         self.CREATE_FOLDER_NAME = 'dummy_images'
-        self.CREATE_FILE_NAME = 'sample'
         self.CSV_PATH = './testdata.csv'
 
-    def create(self, file_name, file_size):
-        cmd = 'cd ' + self.CREATE_FOLDER_PATH
-        subprocess.Popen(cmd)
-        cmd = 'md ' + self.CREATE_FOLDER_NAME
-        subprocess.Popen(cmd)
-        cmd = 'cd ' + self.CREATE_FOLDER_NAME
-        subprocess.Popen(cmd)
-        cmd = 'fsutil file createnew ' + file_name + ' ' + file_size
-        subprocess.Popen(cmd)
+    def determine_file_info(self):
+        return read_csv_data(self.CSV_PATH)
+
+    def create_folder(self):
+        cmd1 = 'md ' + self.CREATE_FOLDER_NAME
+        subprocess.Popen(cmd1, shell=True)
+
+    def create_images(self, file_name, file_size):
+        cmd1 = 'cd ' + self.CREATE_FOLDER_NAME
+        cmd2 = 'fsutil file createnew ' + file_name + ' ' + file_size
+        print(cmd1)
+        subprocess.Popen(cmd1 + ' & ' + cmd2, shell=True)
 
 
 if __name__ == '__main__':
     test = CreateImage()
-    data_info_list = test.read_csv_data(test.CSV_PATH)
-    print(data_info_list[0])
+    # csvファイルからファイル名とファイルサイズを取得する
+    data_info_list = test.determine_file_info()
+
+    # 作成したダミーデータを格納するフォルダを作成する
+    test.create_folder()
+    # ファイル名とファイルサイズに応じたダミーデータを作成する
+    for i in data_info_list:
+        test.create_images(i[0], i[1])
